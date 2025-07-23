@@ -1,0 +1,27 @@
+// Initialize
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. First get camera working
+    const video = document.getElementById('video');
+    try {
+        video.srcObject = await navigator.mediaDevices.getUserMedia({ video: true });
+    } catch (err) {
+        alert(`Camera Error: ${err.message}`);
+        return;
+    }
+
+    // 2. Then load models
+    try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri('/face-detection/models/');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('/face-detection/models/');
+    } catch (err) {
+        alert(`Model Error: ${err.message}`);
+        return;
+    }
+
+    // 3. Setup detection button
+    document.getElementById('detect').addEventListener('click', async () => {
+        const detections = await faceapi.detectAllFaces(video, 
+            new faceapi.TinyFaceDetectorOptions());
+        alert(`Found ${detections.length} faces!`);
+    });
+});
